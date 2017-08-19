@@ -1,13 +1,12 @@
-'use strict';
 
 const express = require('express');
 const bodyParser = require('body-parser');
-const {NotFoundError, AuthorizationError} = require('./errors');
+const { NotFoundError, AuthorizationError } = require('./errors');
 
 const jsonParser = bodyParser.json();
 
 class Resource {
-  constructor(model, options={}) {
+  constructor(model, options = {}) {
     this.model = model;
 
     this.propertyName = options.propertyName || this.model.name;
@@ -39,7 +38,7 @@ class Resource {
 
   requireInstance(req, res, next) {
     this.model.findById(req.params.id)
-      .then(instance => {
+      .then((instance) => {
         if (!instance) {
           next(new NotFoundError('Not found'));
           return;
@@ -47,9 +46,8 @@ class Resource {
         req[this.propertyName] = instance;
         next();
       })
-      .catch(err => {
+      .catch((err) => {
         next(err);
-        return;
       });
   }
 
@@ -64,12 +62,10 @@ class Resource {
           .catch((err) => {
             next(err);
           });
+      } else if (result) {
+        next();
       } else {
-        if (result) {
-          next();
-        } else {
-          next(new AuthorizationError('Access denied'));
-        }
+        next(new AuthorizationError('Access denied'));
       }
     };
   }
@@ -96,7 +92,7 @@ class Resource {
       });
   }
 
-  read(req, res, next) {
+  read(req, res) {
     res.json(req[this.propertyName]);
   }
 

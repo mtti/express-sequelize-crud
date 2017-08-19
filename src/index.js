@@ -1,4 +1,3 @@
-'use strict';
 
 const Resource = require('./resource');
 const { ResourceError, NotFoundError, AuthorizationError } = require('./errors');
