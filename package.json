@@ -8,7 +8,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "lint": "eslint \"src/**/*.js\"",
+    "lint": "eslint \"index.js\" \"src/**/*.js\"",
+    "lint:fix": "eslint --fix \"index.js\" \"src/**/*.js\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
