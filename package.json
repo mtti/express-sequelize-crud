@@ -16,7 +16,8 @@
   "license": "MIT",
   "dependencies": {
     "body-parser": "1.17.2",
-    "express": "4.15.4"
+    "express": "4.15.4",
+    "lodash": "4.17.4"
   },
   "devDependencies": {
     "eslint": "4.5.0",
