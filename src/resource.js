@@ -6,6 +6,14 @@ const { NotFoundError, AuthorizationError } = require('./errors');
 
 const jsonParser = bodyParser.json();
 
+function defaultListConditionsCallback() {
+  return {};
+}
+
+function defaultFilterCallback(item) {
+  return item;
+}
+
 class Resource {
   constructor(model, options = {}) {
     this.model = model;
@@ -25,11 +33,11 @@ class Resource {
     this.operations = options.operations || ['list', 'create', 'read', 'update', 'delete'];
     this.listAttributes = options.listAttributes || ['id'];
     this.listOrder = options.listOrder || [['createdAt', 'ASC']];
-    this.listConditionsCallback = options.listConditionsCallback || function () { return {}; };
+    this.listConditionsCallback = options.listConditionsCallback || defaultListConditionsCallback;
     this.parentPropertyName = options.parentPropertyName || null;
     this.parentForeignKey = options.parentForeignKey || null;
-    this.filterCallback = options.filterCallback || function (item) { return item; };
     this.resourcePath = options.resourcePath || '/:id';
+    this.filterCallback = options.filterCallback || defaultFilterCallback;
 
     this.requireInstance = this.requireInstance.bind(this);
     this.requireAuthorization = this.requireAuthorization.bind(this);
@@ -160,7 +168,7 @@ class Resource {
     }
 
     this.model.create(body)
-      .then(() => {
+      .then((instance) => {
         res.json(this.filterOne(instance, 'create', req));
       })
       .catch((err) => {
@@ -180,7 +188,7 @@ class Resource {
 
     req[this.propertyName].update(req.body)
       .then((instance) => {
-        res.json(this.filterOne(instace, 'update', req));
+        res.json(this.filterOne(instance, 'update', req));
       })
       .catch((err) => {
         next(err);
