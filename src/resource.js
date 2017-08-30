@@ -25,10 +25,11 @@ class Resource {
     this.operations = options.operations || ['list', 'create', 'read', 'update', 'delete'];
     this.listAttributes = options.listAttributes || ['id'];
     this.listOrder = options.listOrder || [['createdAt', 'ASC']];
-    this.listConditionsCallback = options.listConditionsCallback || function() { return {}; };
+    this.listConditionsCallback = options.listConditionsCallback || function () { return {}; };
     this.parentPropertyName = options.parentPropertyName || null;
     this.parentForeignKey = options.parentForeignKey || null;
-    this.filterCallback = options.filterCallback || function(item) { return item; };
+    this.filterCallback = options.filterCallback || function (item) { return item; };
+    this.resourcePath = options.resourcePath || '/:id';
 
     this.requireInstance = this.requireInstance.bind(this);
     this.requireAuthorization = this.requireAuthorization.bind(this);
@@ -45,15 +46,16 @@ class Resource {
       this.router.post('/', jsonParser, this.requireAuthorization('create'), this.create);
     }
     if (_.includes(this.operations, 'read')) {
-      this.router.get('/:id', this.requireInstance, this.requireAuthorization('read'), this.read);
+      this.router.get(this.resourcePath, this.requireInstance, this.requireAuthorization('read'),
+        this.read);
     }
     if (_.includes(this.operations, 'update')) {
-      this.router.put('/:id', this.requireInstance, jsonParser, this.requireAuthorization('update'),
-        this.update);
+      this.router.put(this.resourcePath, this.requireInstance, jsonParser,
+        this.requireAuthorization('update'), this.update);
     }
     if (_.includes(this.operations, 'delete')) {
-      this.router.delete('/:id', this.requireInstance, this.requireAuthorization('delete'),
-        this.delete);
+      this.router.delete(this.resourcePath, this.requireInstance,
+        this.requireAuthorization('delete'), this.delete);
     }
   }
 
@@ -91,14 +93,14 @@ class Resource {
     };
   }
 
-  subResource(slug, model, foreignKey, options={}) {
+  subResource(slug, model, foreignKey, options = {}) {
     const optionsCopy = _.cloneDeep(options);
     optionsCopy.parentForeignKey = foreignKey;
     optionsCopy.parentPropertyName = this.propertyName;
 
     const subResource = new Resource(model, optionsCopy);
 
-    this.router.use(`/:id/${slug}`, this.requireInstance, this.requireAuthorization('subResource'),
+    this.router.use(`${this.resourcePath}/${slug}`, this.requireInstance, this.requireAuthorization('subResource'),
       subResource.router);
 
     return subResource;
@@ -110,7 +112,7 @@ class Resource {
   }
 
   instanceOperation(operationName, handler) {
-    this.router.post(`/:id/${operationName}`, this.requireInstance, jsonParser,
+    this.router.post(`${this.resourcePath}/${operationName}`, this.requireInstance, jsonParser,
       this.requireAuthorization(operationName), handler);
   }
 
