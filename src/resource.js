@@ -114,12 +114,12 @@ class Resource {
     return subResource;
   }
 
-  operation(operationName, handler) {
+  collectionOperation(operationName, handler) {
     this.router.post(`/${operationName}`, jsonParser, this.requireAuthorization(operationName),
       handler);
   }
 
-  instanceOperation(operationName, handler) {
+  resourceOperation(operationName, handler) {
     this.router.post(`${this.resourcePath}/${operationName}`, this.requireInstance, jsonParser,
       this.requireAuthorization(operationName), handler);
   }
